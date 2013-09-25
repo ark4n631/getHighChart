@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html language="es">
+	<head>
+		<title>{% block title %}{% endblock %}</title>
+		<meta charset="utf-8">
+		<link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet" media="screen">
+		<link rel="stylesheet" href="{{ STATIC_URL }}css/font-awesome.min.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="{{ STATIC_URL }}css/bootstrap-responsive.css" rel="stylesheet">
+		{% block css %}{% endblock %}
+	</head>
+	<body>
+		<div id="mensajes" style="margin-top:1px;padding:3px;width: 99.5%;position: fixed;z-index: 99;">
+			{% if messages %}
+				<div class="msg">
+					{% for message in messages %}
+					<div {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}><button type="button" class="close" data-dismiss="alert">x</button>Alerta {{ message }}</div>
+					{% endfor %}
+				</div>
+				{% endif %}
+		</div>
+		<!-- Body -->
+		<div class="container" id="index">
+			<div class="row-fluid container">
+				{% block content %}{% endblock %}
+			</div>
+		</div>
+		<!-- BodyEnd -->
+
+		<!-- Liberías -->
+		<script src="{{ STATIC_URL }}js/jquery-1.9.1.min.js"></script>
+		<script src="{{ STATIC_URL }}js/bootstrap.js"></script>
+		<script src="{{ STATIC_URL }}js/highcharts.js"></script>
+		<script src="{{ STATIC_URL }}js/exporting.js"></script>
+		<!-- fin Liberías -->
+		{% block js_lib %}
+		{% endblock %}
+	</body>
+</html>

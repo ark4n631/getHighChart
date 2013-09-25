@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+	{% block title %}
+		Get High :D
+	{% endblock %}
+
+	{% block content %}
+		<div class="span12 text-center">
+			<h1>Test GetGraph</h1>
+			<div class="span3">
+				<form id="graphForm">
+					<fieldset>
+						<label for="type">Type</label>
+						<select id="type" name="type">
+							<option value="line">LineChart</option>
+							<option value="column">ColumnChart</option>
+							<option value="bar">BarChart</option>
+							<option value="pie">PieChart</option>
+						</select>
+						<label for="catX">Category X-axis</label>
+						<input type="text" placeholder="cat1,cat2,cat3,catN" id="catX" name="catX" required>
+						<label for="catY">Category Y-axis</label>
+						<input type="text" placeholder="cat1,cat2,cat3,catN" id="catY" name="catY" required>
+						<label for="names">Series Names</label>
+						<input type="text" placeholder=" serie1,serie2,serieN" id="names" name="names" required>
+						<label for="title">Title</label>
+						<input type="text" placeholder="Title of my Graph" id="title" name="title">
+						<label for="values">Values</label>
+						<input type="text" placeholder=" [[(serie1)1,2,3],[(serie2)4,5,6]]) [n[],n*[n]]" id="values" name="values" required>
+						<label for="metricX">Metric of X-axis</label>
+						<input type="text" placeholder="°C KM °F" id="metricX" name="metricX">
+						<label for="metricY">Metric of Y-axis</label>
+						<input type="text" placeholder="°C KM °F" id="metricY" name="metricY">
+					</fieldset>
+					<div class="controls">
+						<span class="btn btn-success" id="sendForm">send</span>
+					</div>
+				</form>
+			</div>
+			<div class="span8">
+				<div id="graphDiv"></div>
+			</div>
+		</div>
+	{% endblock %}
+	{% block js_lib %}
+		<!-- Código JS-->
+		<script>
+		var base = '{{host}}';
+		var graph = null;
+		$(function(){
+			$('#sendForm').click(function(){
+				var form = $('#graphForm').serializeObject();
+				var parseNames=form['names'].split(',');
+				var parseCatX = form['catX'].split(',');
+				var parseCatY = form['catY'].split(',');
+				form['names']=parseNames;
+				form['catX']=parseCatX;
+				form['catY']=parseCatY;
+				console.log(form);
+				$.ajax({
+					url:base+'getGraph',
+					data:form,
+					type:'get',
+					success:function(data){
+						if(data.errors){
+							for(error in data.errors){
+								var msg = '<div class="alert alert-error"><button type="button" class="close" data-dismiss="alert">x</button><i class="icon-warning-sign"></i>&nbsp;Alerta: '+data.errors[error]+'.</div>';
+							$('#mensajes').append(msg);
+							// console.log(data.errors[error]);
+							}
+						}else{
+							// console.log(data);
+						}
+					},
+					error:function(){
+						var msg = '<div class="alert alert-error"><button type="button" class="close" data-dismiss="alert">x</button><i class="icon-warning-sign"></i>&nbsp;Alerta: '+'Server did not response'+'.</div>';
+							$('#mensajes').append(msg);
+					}
+				}).done(function(data){
+					if(graph!=null){
+						graph.fnDestroy();
+						graph=null;
+					}
+					if(data.errors){
+						
+					}else{
+						$('#graphDiv').highcharts(data);
+					}
+				});
+			})
+		});
+
+		function serialize (obj) {
+			var str = [];
+			for(var p in obj)
+				str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+			return str.join("&");
+		}
+
+		$.fn.serializeObject = function()
+		{
+			var o = {};
+			var a = this.serializeArray();
+			$.each(a, function() {
+				if (o[this.name] !== undefined) {
+					if (!o[this.name].push) {
+						o[this.name] = [o[this.name]];
+					}
+					o[this.name].push(this.value || '');
+				} else {
+					o[this.name] = this.value || '';
+				}
+			});
+			return o;
+		};
+		</script>
+	{% endblock %}
